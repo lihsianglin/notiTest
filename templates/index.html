@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>通知測試</title>
+	<style type="text/css">
+		body {
+			font-family: 微軟正黑體;
+		}
+		#unread_count {
+			padding: 5px 8px 5px 8px;
+			margin-left: 5px;
+			border: 1px solid red;
+			background-color: red;
+			color: white; 	
+			border-radius: 20%;
+			display: none;
+			font-size: 14px;
+			font-weight: 900;
+		}
+	</style>
+	<script type="text/javascript">
+		function get_noti_unread_count() {
+			{% if request.user.is_authenticated %}
+				var unread_count_span = document.getElementById("unread_count");
+				var xmlhttp;
+
+				if(window.XMLHttpRequest) {		//for IE7+, Firefox, Chrome, Opera, Safari
+						xmlhttp = new XMLHttpRequest();
+				}
+				else {							//for IE6, IE5
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+
+				xmlhttp.onreadystatechange = function() {
+					if(xmlhttp.readyState==4 && xmlhttp.status==200) {
+						if(xmlhttp.responseText == "0") {
+							unread_count_span.style.display = "none";
+						}
+						else {
+							unread_count_span.style.display = "inline";
+						}
+						unread_count_span.innerHTML = xmlhttp.responseText;
+					}
+				}
+
+				xmlhttp.open("GET", "/get_noti_unread_count/", true);
+				xmlhttp.send();
+				setTimeout("get_noti_unread_count()", 1000);
+			{% endif %}
+		}
+
+		function getNotifications() {
+			var notiDiv = document.getElementById("notiDiv");
+			var button = document.activeElement;
+			var xmlhttp;
+
+			if(button.style.color == "") {
+				button.style.color = "blue";
+				if(window.XMLHttpRequest) {		//for IE7+, Firefox, Chrome, Opera, Safari
+					xmlhttp = new XMLHttpRequest();
+				}
+				else {							//for IE6, IE5
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+
+				xmlhttp.onreadystatechange = function() {
+					if(xmlhttp.readyState==4 && xmlhttp.status==200) {
+						notiDiv.innerHTML = xmlhttp.responseText;
+					}
+				}
+
+				xmlhttp.open("GET", "/getNotifications/", true);
+				xmlhttp.send();
+			}
+			else {
+				button.style.color = "";
+				notiDiv.innerHTML = "";
+			}
+					
+		}
+
+	</script>
+</head>
+<body onload="get_noti_unread_count()">
+	{% if request.user.is_authenticated %}
+		<button type="button" onclick="getNotifications()">通知</button><span id="unread_count"></span>
+		<div id="notiDiv"></div>
+		<hr>
+		<form method="get", action="/sendmsg/">
+			<input type="text" name="recipient"><br>
+			<textarea name="msg" rows="10" cols="40"></textarea><br>
+			<button>提交</button>
+		</form>
+	{% else %}
+		<h1>請先登入</h1>
+	{% endif %}
+</body>
+</html>
