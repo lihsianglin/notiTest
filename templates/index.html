@@ -83,6 +83,7 @@
 </head>
 <body onload="get_noti_unread_count()">
 	{% if request.user.is_authenticated %}
+		<h1>你好, {{ username }}</h1>
 		<button type="button" onclick="getNotifications()">通知</button><span id="unread_count"></span>
 		<div id="notiDiv"></div>
 		<hr>

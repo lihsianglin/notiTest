@@ -9,6 +9,8 @@ def index(request):
 	template = "index.html"
 	response = ""
 	args = {}
+	if request.user:
+		args['username'] = request.user
 	return render(request, template, args)
 
 def getNotifications(request):
